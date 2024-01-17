@@ -1,0 +1,44 @@
+version: "3.6"
+services:
+  postgres:
+    image: postgres:12
+    restart: always
+    volumes:
+      - hasura_db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+  graphql-engine:
+    image: hasura/graphql-engine:latest
+    ports:
+      - "28085:8080"
+    depends_on:
+      - "postgres"
+    restart: always
+    environment:
+      HASURA_GRAPHQL_STRINGIFY_NUMERIC_TYPES: true
+      HASURA_GRAPHQL_METADATA_DATABASE_URL: "${HASURA_GRAPHQL_METADATA_DATABASE_URL}"
+      HASURA_GRAPHQL_ADMIN_SECRET: "${HASURA_GRAPHQL_ADMIN_SECRET}"
+      HASURA_GRAPHQL_ENABLE_TELEMETRY: "false"
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_DEV_MODE: "true"
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: "startup, http-log, webhook-log, websocket-log, query-log"
+      HASURA_GRAPHQL_JWT_SECRET: "${HASURA_GRAPHQL_JWT_SECRET}"
+      ACTION_BASE_URL: "http://hlambda-core:1331"
+  hlambda-core:
+    image: hlambda/hlambda-core:latest
+    environment:
+      HLAMBDA_ADMIN_SECRET: "${HLAMBDA_ADMIN_SECRET}"
+    ports:
+      - "28086:1331"
+    restart: always
+    volumes:
+      - hlambda_metadata:/usr/src/app/metadata
+
+volumes:
+  hasura_db_data:
+  hlambda_metadata:
+
+networks:
+  default:
+    external: true
+    name: intranet
