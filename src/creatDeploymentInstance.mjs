@@ -10,6 +10,8 @@ import crypto from "crypto";
 import { readFile, writeFile, mkdir } from "fs/promises";
 // import { DateTime } from "luxon"; // Unnecessary dependency
 
+import parseArgs from "./utils/getArgs.mjs";
+
 // Better than uuidv4 from package uuid
 // const generatedId = crypto.randomUUID();
 const generatedId = crypto.randomBytes(5).toString("hex");
@@ -21,9 +23,11 @@ const generatedId = crypto.randomBytes(5).toString("hex");
 const date = new Date();
 const timeOfGeneration = date.toISOString().replace("T", " ").substring(0, 19);
 
+const parsedArgsObject = parseArgs();
+
 // This is the secret generator part...
-const __PROJECT_NAME = ""; // "Example Project"; // Choose your project name here
-const __PROJECT_STACK_NAME = ""; // "Hasura + Hlambda + Postgres"; // Choose your project stack name here
+const __PROJECT_NAME = parsedArgsObject?.["name"] ?? ""; // "Example Project"; // Choose your project name here
+const __PROJECT_STACK_NAME = parsedArgsObject?.["stackName"] ?? ""; // "Hasura + Hlambda + Postgres"; // Choose your project stack name here
 // ---
 const __CONST_POSTGRES_USER = "postgres";
 const __CONST_POSTGRES_DATABASE_NAME = "postgres";
@@ -72,7 +76,6 @@ HASURA_GRAPHQL_JWT_SECRET='{"claims_namespace_path":"$", "type":"RS256", "key": 
 # Hlambda service
 HLAMBDA_ADMIN_SECRET="${__CONST_HLAMBDA_ADMIN_SECRET}"
 HLAMBDA_JWT_PRIVATE_KEY="${__CONST_PRIVATE_KEY}"
-LABUD="labud"
 `;
 
 // Read the docker compose file
@@ -82,7 +85,10 @@ const dockerComposeFile = await readFile("./src/docker-compose.yaml", "utf8");
 // because it can contain ${} as part of yaml syntax, and it will be interpreted as a template string in js.
 // and this is why we only generate .env file and copy docker-compose.yaml file as is.
 
-const deploymentInstanceName = `di-${generatedId}`;
+const deploymentInstanceName =
+  typeof __PROJECT_NAME === "string" && __PROJECT_NAME !== ""
+    ? `di-${generatedId}-${__PROJECT_NAME}`
+    : `di-${generatedId}`;
 
 console.log(`Creating deployment instance "${deploymentInstanceName}"`);
 

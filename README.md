@@ -8,6 +8,10 @@ I've been immersed in various projects and exciting endeavors using stacks like 
 node ./src/creatDeploymentInstance.mjs
 ```
 
+```bash
+node ./src/creatDeploymentInstance.mjs --name MyProject
+```
+
 # Portainer tips and tricks
 
 When creating a new stack you can copy docket-compose.yaml contents into the editor, then under "Environment variables" ➤ "Advanced mode" ➤ Paste the contents of the .env file.
