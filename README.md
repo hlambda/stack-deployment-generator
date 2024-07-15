@@ -12,6 +12,10 @@ node ./src/creatDeploymentInstance.mjs
 node ./src/creatDeploymentInstance.mjs --name MyProject
 ```
 
+```bash
+node ./src/creatDeploymentInstance.mjs --name "UnicornStartup" --stackPrefix "web-app-unicorn-startup"
+```
+
 # Portainer tips and tricks
 
 When creating a new stack you can copy docket-compose.yaml contents into the editor, then under "Environment variables" ➤ "Advanced mode" ➤ Paste the contents of the .env file.
